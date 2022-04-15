@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <PackageId>OpilioCraft.Lisp.Runtime</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.5.0</Version>
     <Authors>Carsten Schäfer</Authors>
     <Description>Implements a rich featured LISP runtime for OpilioCraft.Lisp, e.g. integrates ObjectPath.</Description>
     <Copyright>Copyright (c) 2022 by Carsten Schäfer</Copyright>
@@ -19,17 +19,17 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Compile Include="Attributes.fs" />
-    <Compile Include="ObjectPath.fs" />
+    <Compile Include="ModelExtension.fs" />
+    <Compile Include="ObjectPathExtension.fs" />
     <Compile Include="Functions.fs" />
     <Compile Include="Macros.fs" />
-    <Compile Include="Runtime.fs" />
+    <Compile Include="LispRuntime.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="OpilioCraft.Lisp" Version="1.0.0" />
-    <PackageReference Include="OpilioCraft.Lisp.StandardLib" Version="1.0.0" />
+    <PackageReference Include="OpilioCraft.Lisp" Version="2.2.3" />
+    <PackageReference Include="OpilioCraft.Lisp.StandardLib" Version="2.0.0" />
     <PackageReference Include="OpilioCraft.ObjectPath" Version="1.0.0" />
   </ItemGroup>
   
