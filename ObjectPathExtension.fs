@@ -60,12 +60,12 @@ let macroPropertyIsNot (exprList : Expression list) : Expression =
 
 let macroPropertyContains (exprList : Expression list) : Expression =
     match exprList with
-    | [ Atom (FlexibleValue.String _) ; Atom _ ] as [ objectPath ; pattern ] ->
+    | [ Atom _ ; Atom _ ] as [ objectPath ; pattern ] ->
         List [ Symbol "contains" ; List [ Symbol "property" ; objectPath ] ; pattern ]
     | _ -> raise <| InvalidLispExpressionException "property-contains expects an object path and an atom as arguments"
 
 let macroPropertyMatches (exprList : Expression list) : Expression =
     match exprList with
-    | [ Atom (FlexibleValue.String _) ; Atom _ ] as [ objectPath ; pattern ] ->
+    | [ Atom _ ; Atom _ ] as [ objectPath ; pattern ] ->
         List [ Symbol "matches" ; List [ Symbol "property" ; objectPath ] ; pattern ]
     | _ -> raise <| InvalidLispExpressionException "property-matches expects an object path and an atom as arguments"

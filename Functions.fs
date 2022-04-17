@@ -15,4 +15,4 @@ let bfuncMatches (exprA, exprB) : Expression =
     match (exprA, exprB) with
     | Atom (FlexibleValue.String value) , Atom (FlexibleValue.String pattern) ->
         Regex.IsMatch(value, pattern) |> LispBoolean
-    | _ -> raise <| InvalidLispExpressionException $"contains expects two string arguments"
+    | _ -> raise <| InvalidLispExpressionException $"matches expects two string arguments"
