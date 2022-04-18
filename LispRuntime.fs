@@ -47,8 +47,8 @@ type LispRuntime private () =
 
     // ObjectPath context
     member private _.ObjectPathContextProvider () = objectPathContext
-    member _.UpdateResultHook hook = objectPathContext <- { objectPathContext with ResultHook = hook }
-    member _.UpdateObjectData objData = objectPathContext <- { objectPathContext with ObjectData = objData }
+    member x.InjectResultHook hook = objectPathContext <- { objectPathContext with ResultHook = hook }; x
+    member x.InjectObjectData objData = objectPathContext <- { objectPathContext with ObjectData = objData }; x
 
     // High-level API
     member x.LoadFile path =
@@ -65,12 +65,10 @@ type LispRuntime private () =
         | _ -> None
 
     member x.EvalWithContext contextData lispExpr =
-        x.UpdateObjectData contextData
-        x.Eval lispExpr
+        x.InjectObjectData(contextData).Eval lispExpr
 
     member x.EvalWithContextAndResult contextData lispExpr =
-        x.UpdateObjectData contextData
-        x.EvalWithResult lispExpr
+        x.InjectObjectData(contextData).EvalWithResult lispExpr
 
     member x.RunWithContext context =
         x.Parse >> (x.EvalWithContext context)
