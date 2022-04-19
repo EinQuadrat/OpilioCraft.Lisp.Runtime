@@ -2,7 +2,7 @@
 
 open System.IO
 
-open OpilioCraft.Lisp.Runtime
+open OpilioCraft.FSharp.Prelude
 open OpilioCraft.Lisp.Runtime.ObjectPathExtension
 
 type LispRuntime private () =
@@ -25,13 +25,9 @@ type LispRuntime private () =
         OpilioCraft.Lisp.StandardLib.binaryFunctions |> Map.iter (fun name body -> instance.Register(name, body))
         OpilioCraft.Lisp.StandardLib.ordinaryFunctions |> Map.iter (fun name body -> instance.Register(name, body))
 
-        // additional functions
-        instance.Register("contains", Functions.bfuncContains)
-        instance.Register("matches", Functions.bfuncMatches)
-
         // ObjectPath extension
-        instance.Register("has-property",       (funcIsValidObjectPath instance.ObjectPathContextProvider))
         instance.Register("property",           (funcLookupObjectPath instance.ObjectPathContextProvider))
+        instance.Register("has-property",       (funcIsValidObjectPath instance.ObjectPathContextProvider))
         instance.Register("property-is",        macroPropertyIs)
         instance.Register("property-is-not",    macroPropertyIsNot)
         instance.Register("property-contains",  macroPropertyContains)
@@ -59,22 +55,7 @@ type LispRuntime private () =
             raise <| new System.IO.FileNotFoundException(null, path)
 
     member x.TryParse lispString =
-        try
-            x.Parse lispString |> Some
-        with
-        | _ -> None
-
-    member x.EvalWithContext contextData lispExpr =
-        x.InjectObjectData(contextData).Eval lispExpr
-
-    member x.EvalWithContextAndResult contextData lispExpr =
-        x.InjectObjectData(contextData).EvalWithResult lispExpr
-
-    member x.RunWithContext context =
-        x.Parse >> (x.EvalWithContext context)
-
-    member x.RunWithContextAndResult context =
-        x.Parse >> (x.EvalWithContextAndResult context)
+        x.ParseWithResult lispString |> Result.toOption
 
     member _.ResultToString (result : Result<Expression, string>) =
         match result with
