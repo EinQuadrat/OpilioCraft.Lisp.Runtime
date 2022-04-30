@@ -1,17 +1,17 @@
 ﻿namespace OpilioCraft.Lisp
 
-type UnaryFunction = Expression -> Expression
-type BinaryFunction = Expression * Expression -> Expression
+type UnaryFunction = Environment -> Expression -> Expression
+type BinaryFunction = Environment -> Expression * Expression -> Expression
 
 module FunctionHelper =
     let liftExpression (expr : Expression) = [ expr ]
 
-    let liftUnary (opName : string) (op : UnaryFunction) (args : Expression list) =
+    let liftUnary (opName : string) (op : UnaryFunction) (env : Environment) (args : Expression list) =
         match args with
-        | [ arg ] -> op arg
+        | [ arg ] -> op env arg
         | _ -> raise <| InvalidLispExpressionException $"Function {opName} expects exactly one argument"
 
-    let liftBinary (opName : string) (op : BinaryFunction) (args : Expression list) =
+    let liftBinary (opName : string) (op : BinaryFunction) (env : Environment) (args : Expression list) =
         match args with
-        | [ a; b ] -> op (a, b)
+        | [ a; b ] -> op env (a, b)
         | _ -> raise <| InvalidLispExpressionException $"Function {opName} expects exactly two arguments"

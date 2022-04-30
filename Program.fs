@@ -11,7 +11,7 @@ let main _ =
     let runtime = LispRuntime.Initialize ()
 
     """ (property-matches "$.Name" "est.*ct") """
-    |> runtime.RunWithContextAndResult testObj
+    |> runtime.InjectObjectData(testObj).RunWithResult
     |> runtime.PrintResult
 
     0
