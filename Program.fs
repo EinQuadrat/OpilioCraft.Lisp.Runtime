@@ -1,4 +1,4 @@
-﻿module OpilioCraft.Lisp.UI
+﻿module OpilioCraft.Lisp.Test
 
 // test data
 let testObj = {|
@@ -10,7 +10,8 @@ let testObj = {|
 let main _ =
     let runtime = LispRuntime.Initialize ()
 
-    """ (property-matches "$.Name" "est.*ct") """
+    //""" (property-matches "$.Name" "est.*ct") """
+    """ (property-is "$.Env.[SlotB]" 42) """
     |> runtime.InjectObjectData(testObj).RunWithResult
     |> runtime.PrintResult
 

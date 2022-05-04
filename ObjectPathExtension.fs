@@ -19,22 +19,21 @@ let private evalObjectPath (context : ObjectPathContext) objectPath : obj option
     context.Runtime.TryRun objectPath
     
 let funcIsValidObjectPath (contextProvider : ObjectPathContextProvider) (env : Environment) (exprList : Expression list) : Expression =
-    List.map (Evaluator.evalExpression env) exprList
-    |> function
-        | [ Atom (FlexibleValue.String objectPath) ] ->
-            evalObjectPath (contextProvider()) objectPath
-            |> Option.isSome
-            |> FlexibleValue.Boolean
-            |> Atom
+    match exprList with
+    | [ Atom (FlexibleValue.String objectPath) ] ->
+        evalObjectPath (contextProvider()) objectPath
+        |> Option.isSome
+        |> FlexibleValue.Boolean
+        |> Atom
 
-        | _ -> raise <| InvalidLispExpressionException "has-property excepts exactly one argument containing an object path"
+    | _ -> raise <| InvalidLispExpressionException "has-property excepts exactly one argument containing an object path"
 
 let funcLookupObjectPath (contextProvider : ObjectPathContextProvider) (env : Environment) (exprList : Expression list) : Expression =
-    List.map (Evaluator.evalExpression env) exprList
-    |> function
-        | [ Atom (FlexibleValue.String objectPath) ] -> objectPath, (Symbol "#UNKNOWN-PROPERTY")
-        | [ Atom (FlexibleValue.String objectPath) ; Atom _ ] as [ _ ; defaultValue ]-> objectPath, defaultValue
-        | _ -> raise <| InvalidLispExpressionException "property excepts an object path and optionally an atom as default value"
+    match exprList with
+    | [ Atom (FlexibleValue.String objectPath) ] -> objectPath, (Symbol ":UNKNOWN-PROPERTY")
+    | [ Atom (FlexibleValue.String objectPath) ; Atom _ ] as [ _ ; defaultValue ]-> objectPath, defaultValue
+    | _ -> raise <| InvalidLispExpressionException "property excepts an object path and optionally an atom as default value"
+
     |> fun (objectPath, defaultValue) -> 
         let context = contextProvider() in
         

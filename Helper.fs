@@ -1,8 +1,5 @@
 ﻿namespace OpilioCraft.Lisp
 
-type UnaryFunction = Environment -> Expression -> Expression
-type BinaryFunction = Environment -> Expression * Expression -> Expression
-
 module FunctionHelper =
     let liftExpression (expr : Expression) = [ expr ]
 

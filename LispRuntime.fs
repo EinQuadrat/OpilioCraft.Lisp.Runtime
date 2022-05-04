@@ -1,6 +1,6 @@
 ﻿namespace OpilioCraft.Lisp
 
-open System.IO
+open System
 
 open OpilioCraft.FSharp.Prelude
 open OpilioCraft.Lisp.Runtime.ObjectPathExtension
@@ -21,41 +21,41 @@ type LispRuntime private () =
         let instance = new LispRuntime ()
 
         // add standard library
-        OpilioCraft.Lisp.StandardLib.unaryFunctions |> Map.iter (fun name body -> instance.Register(name, body))
-        OpilioCraft.Lisp.StandardLib.binaryFunctions |> Map.iter (fun name body -> instance.Register(name, body))
+        OpilioCraft.Lisp.StandardLib.unaryFunctions    |> Map.iter (fun name body -> instance.Register(name, body))
+        OpilioCraft.Lisp.StandardLib.binaryFunctions   |> Map.iter (fun name body -> instance.Register(name, body))
         OpilioCraft.Lisp.StandardLib.ordinaryFunctions |> Map.iter (fun name body -> instance.Register(name, body))
 
         // ObjectPath extension
-        instance.Register("property",           (funcLookupObjectPath instance.ObjectPathContextProvider))
-        instance.Register("has-property",       (funcIsValidObjectPath instance.ObjectPathContextProvider))
-        instance.Register("property-is",        macroPropertyIs)
-        instance.Register("property-is-not",    macroPropertyIsNot)
-        instance.Register("property-contains",  macroPropertyContains)
-        instance.Register("property-matches",   macroPropertyMatches)
+        instance.Register("property"           , funcLookupObjectPath instance.ObjectPathContextProvider)
+        instance.Register("has-property"       , funcIsValidObjectPath instance.ObjectPathContextProvider)
+
+        instance.Register(":property-is"       , macroPropertyIs)
+        instance.Register(":property-is-not"   , macroPropertyIsNot)
+        instance.Register(":property-contains" , macroPropertyContains)
+        instance.Register(":property-matches"  , macroPropertyMatches)
 
         // return it
         instance
 
     // simplify function registration
-    member x.Register(name, body : Function) = x.RegisterFunction name body
-    member x.Register(name, body : UnaryFunction) = x.RegisterFunction name (FunctionHelper.liftUnary name body)
-    member x.Register(name, body : BinaryFunction) = x.RegisterFunction name (FunctionHelper.liftBinary name body)
+    member x.Register(name, body : Function)       = body |> x.RegisterFunction name
+    member x.Register(name, body : UnaryFunction)  = body |> FunctionHelper.liftUnary name  |> x.RegisterFunction name
+    member x.Register(name, body : BinaryFunction) = body |> FunctionHelper.liftBinary name |> x.RegisterFunction name
 
     // ObjectPath context
     member private _.ObjectPathContextProvider () = objectPathContext
-    member x.InjectResultHook hook = objectPathContext <- { objectPathContext with ResultHook = hook }; x
-    member x.InjectObjectData objData = objectPathContext <- { objectPathContext with ObjectData = objData }; x
+    member x.InjectResultHook hook = objectPathContext    <- { objectPathContext with ResultHook = hook }    ; x
+    member x.InjectObjectData objData = objectPathContext <- { objectPathContext with ObjectData = objData } ; x
 
     // High-level API
-    member x.LoadFile path =
-        if File.Exists path
+    member _.LoadFile path =
+        if IO.File.Exists path
         then
-            path |> File.ReadAllText
+            IO.File.ReadAllText path
         else
-            raise <| new System.IO.FileNotFoundException(null, path)
+            raise <| new IO.FileNotFoundException (null, path)
 
-    member x.TryParse lispString =
-        x.ParseWithResult lispString |> Result.toOption
+    member x.TryParse = x.ParseWithResult >> Result.toOption
 
     member _.ResultToString (result : Result<Expression, string>) =
         match result with
@@ -64,4 +64,4 @@ type LispRuntime private () =
 
     member x.PrintResult (result : Result<Expression, string>) =
         x.ResultToString result
-        |> System.Console.WriteLine
+        |> Console.WriteLine
